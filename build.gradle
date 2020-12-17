@@ -1,0 +1,46 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+ext {
+    hadoopVersion = '2.8.5'
+    lombokVersion = '1.18.2'
+    sparkVersion = '2.4.4'
+    slf4jVersion = '1.7.25'
+    mockitoVersion = '2.21.0'
+    jCommanderVersion= '1.78'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "com.beust:jcommander:${jCommanderVersion}"
+    compile "org.projectlombok:lombok:${lombokVersion}"
+    compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    compileOnly "org.apache.spark:spark-core_2.11:${sparkVersion}"
+    compileOnly "org.apache.spark:spark-sql_2.11:${sparkVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+shadowJar {
+    zip64 true
+    configurations = [project.configurations.runtime]
+}
