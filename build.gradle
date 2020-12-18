@@ -30,8 +30,8 @@ dependencies {
     compile "com.beust:jcommander:${jCommanderVersion}"
     compile "org.projectlombok:lombok:${lombokVersion}"
     compile "org.slf4j:slf4j-api:${slf4jVersion}"
-    compileOnly "org.apache.spark:spark-core_2.11:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-sql_2.11:${sparkVersion}"
+    compile "org.apache.spark:spark-core_2.11:${sparkVersion}"
+    compile "org.apache.spark:spark-sql_2.11:${sparkVersion}"
 
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 

@@ -14,12 +14,14 @@ import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Getter
 @Setter
 @Parameters(separators = "=")
 @SuppressWarnings("checkstyle:magicnumber")
+@Slf4j
 public class UserPlaceStatsArgsParser {
     private static final ZoneId UTC = ZoneId.of("UTC");
 
@@ -35,15 +37,18 @@ public class UserPlaceStatsArgsParser {
     @Parameter(names = {"--end-date", "-ed"}, order = 3, validateWith = ValidateDateArgument.class, description = "The end date parameter")
     private String endDate;
 
-    @Parameter(names = {"--userId", "-u"}, order = 4, description = "The userId for which the stats need to be generated")
+    @Parameter(names = {"--user-id", "-u"}, order = 4, description = "The userId for which the stats need to be generated")
     private String userId;
+
+    @Parameter(names = {"--number-of-restaurants", "-n"}, order = 5, description = "The number of restaurants")
+    private String numberOfRestaurants;
 
 
     public static class ValidateDateArgument implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
             try {
-                    LocalDate.parse(value);
+                LocalDate.parse(value);
 
             } catch (DateTimeParseException ex) {
                 throw new ParameterException(String.format("The given date is not in a parsable format: %s", value));
@@ -52,11 +57,20 @@ public class UserPlaceStatsArgsParser {
     }
 
     public Date getStartDate(){
-         return Date.valueOf(startDate);
+        return (null!= startDate) ?Date.valueOf(startDate): null;
+    }
+
+    public Integer getNumberOfRestaurants(){
+        try {
+            return  (null != numberOfRestaurants ) ?Integer.parseInt(numberOfRestaurants) : null;
+
+        } catch (DateTimeParseException ex) {
+            throw new ParameterException(String.format("The given number of restaurants is not a number: %s", numberOfRestaurants));
+        }
     }
 
     public Date getEndDate(){
-        return Date.valueOf(endDate);
+        return (null!= endDate) ?Date.valueOf(endDate): null;
     }
 
     public StatsType getStatTypes() {

@@ -9,7 +9,8 @@ import org.apache.spark.sql.SparkSession;
 
 import java.sql.Date;
 
-import static com.playstation.takehome.utility.DataConversionUtility.convertDateTimeToEpochSeconds;
+import static com.playstation.takehome.utility.DataConversionUtility.getEndOftheDayEpochSeconds;
+import static com.playstation.takehome.utility.DataConversionUtility.getStartOftheDayEpochSeconds;
 
 @Slf4j
 public class PlaceStats {
@@ -40,7 +41,7 @@ public class PlaceStats {
         String whereClause = "WHERE visitEpochSecond BETWEEN '%s' AND '%s'";
         String formattedWhereClause = StringUtils.EMPTY;
         if(null!= startDate && null != endDate){
-            formattedWhereClause = String.format(whereClause,convertDateTimeToEpochSeconds(String.valueOf(startDate)),convertDateTimeToEpochSeconds(String.valueOf(endDate)));
+            formattedWhereClause = String.format(whereClause,getStartOftheDayEpochSeconds(startDate),getEndOftheDayEpochSeconds(endDate));
         }
         String formattedTotalSalesQuery = String.format(totalSalesQuery,JOINED_VIEW,formattedWhereClause);
         log.info("formattedTotalSalesQuery {} ",formattedTotalSalesQuery);

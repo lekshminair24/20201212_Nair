@@ -42,6 +42,7 @@ public class UserPlaceStatsSparkJob implements Serializable {
     private Date startDate;
     private Date endDate;
     private String userId;
+    private Integer numberOfRestaurants;
 
     public UserPlaceStatsSparkJob(UserPlaceStatsArgsParser jobArguments) {
         sparkSession = getSparkSession();
@@ -83,7 +84,7 @@ public class UserPlaceStatsSparkJob implements Serializable {
                 topThreeRestaurantsByCuisine.repartition(1).write().mode(SaveMode.Overwrite).json(OUTPUT_TOP3_BY_CUISINE);
                 break;
             case TOPNPLACEBYCUISINE:
-                Dataset<Row> topNRestaurantsByCuisine = new PlaceStats(sparkSession).getTopNRestaurantsByCuisine(placeDetailsWithCuisinesDataset, userPlaceInteractionDataset, startDate, endDate, null);
+                Dataset<Row> topNRestaurantsByCuisine = new PlaceStats(sparkSession).getTopNRestaurantsByCuisine(placeDetailsWithCuisinesDataset, userPlaceInteractionDataset, startDate, endDate, numberOfRestaurants);
                 topNRestaurantsByCuisine.repartition(1).write().mode(SaveMode.Overwrite).json(OUTPUT_TOPN_BY_CUISINE);
                 break;
             case AVGUSERVISIT:
@@ -96,12 +97,12 @@ public class UserPlaceStatsSparkJob implements Serializable {
                 topNRecommendedPlace.repartition(topNRecommendedPlace.col(USER_ID_COL)).write().partitionBy(USER_ID_COL).mode(SaveMode.Overwrite).json(OUTPUT_USERS_PLACE_RECO);
                 break;
             case PLACENOTVISITED:
-                userStats = new UserStats(sparkSession);
-                Dataset<Row> topNRecommendedPlaces = sparkSession.read().json().where(String.format("userId = '%s' ", userId));
+                UserStats userstats = new UserStats(sparkSession);
+                Dataset<Row> topNRecommendedPlaces = sparkSession.read().json(OUTPUT_USERS_PLACE_RECO).where(String.format("userId = '%s' ", userId));
                 if (topNRecommendedPlaces.isEmpty()) {
-                    topNRecommendedPlaces = userStats.getTopNRecommendedRestaurants(userPlaceInteractionDataset, usersProfileDataset, placeDetailsWithCuisinesDataset, userId);
+                    topNRecommendedPlaces =  userstats.getTopNRecommendedRestaurants(userPlaceInteractionDataset, usersProfileDataset, placeDetailsWithCuisinesDataset, userId);
                 }
-                Dataset<Row> recommendedPlaces = userStats.recommendNotVisitedPlace(topNRecommendedPlaces, userPlaceInteractionDataset, userId);
+                Dataset<Row> recommendedPlaces =  userstats.recommendNotVisitedPlace(topNRecommendedPlaces, userPlaceInteractionDataset, userId);
                 recommendedPlaces.repartition(recommendedPlaces.col(USER_ID_COL)).write().partitionBy(USER_ID_COL).mode(SaveMode.Overwrite).json(OUTPUT_USERS_PLACE_YET_TO_VIST);
                 break;
         }
@@ -118,6 +119,7 @@ public class UserPlaceStatsSparkJob implements Serializable {
         this.startDate = jobArguments.getStartDate();
         this.endDate = jobArguments.getEndDate();
         this.userId = jobArguments.getUserId();
+        this.numberOfRestaurants = jobArguments.getNumberOfRestaurants();
     }
 
 

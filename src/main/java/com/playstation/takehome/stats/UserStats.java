@@ -94,7 +94,7 @@ public class UserStats {
                 .dropDuplicates()
                 .createOrReplaceTempView(USER_VISITED_VIEW);
         recommendedPlacesDataset.createOrReplaceTempView(RECOMMENDED_PLACES_VIEW);
-        String placesNotVisitedQuery = "SELECT r.* FROM %s r LEFT ANTI JOIN %s u ON r.placeId= u.placeId ";
+        String placesNotVisitedQuery = "SELECT r.* FROM %s r LEFT ANTI JOIN %s u ON r.placeId= u.placeId  order by cuisines";
         return sparkSession.sql(String.format(placesNotVisitedQuery, RECOMMENDED_PLACES_VIEW, USER_VISITED_VIEW));
     }
 }
