@@ -55,14 +55,14 @@ public class UserPlaceStatsSparkJob implements Serializable {
     }
 
     public static void main(final String[] args) {
-        final UserPlaceStatsArgsParser jobArguments = new UserPlaceStatsArgsParser();
-        final JCommander jCommander = new JCommander(jobArguments, null, args);
-        JCommander.newBuilder().addObject(jobArguments).build().parse(args);
-        if (jobArguments.isHelp()) {
-            jCommander.usage();
-            System.exit(0);
-        }
-        new UserPlaceStatsSparkJob(jobArguments).run();
+            final UserPlaceStatsArgsParser jobArguments = new UserPlaceStatsArgsParser();
+            final JCommander jCommander = new JCommander(jobArguments, null, args);
+            JCommander.newBuilder().addObject(jobArguments).build().parse(args);
+            if (jobArguments.isHelp()) {
+                jCommander.usage();
+                System.exit(0);
+            }
+            new UserPlaceStatsSparkJob(jobArguments).run();
     }
 
 
@@ -120,7 +120,34 @@ public class UserPlaceStatsSparkJob implements Serializable {
         this.endDate = jobArguments.getEndDate();
         this.userId = jobArguments.getUserId();
         this.numberOfRestaurants = jobArguments.getNumberOfRestaurants();
+        validateInputParams();
+
     }
 
+    private void validateInputParams(){
+        switch (statsType){
+            case TOP3PLACEBYCUISINE:
+                if(startDate==null || endDate== null){
+                    throw new UserPlaceException("startDate and endDate are required parameters for statsType "+statsType.name());
+                }
+            break;
+            case TOPNPLACEBYCUISINE:
+                if(startDate==null || endDate== null || numberOfRestaurants == null){
+                    throw new UserPlaceException("startDate,endDate and numberOfRestaurants  are required parameters for statsType "+statsType.name());
+                }
+            break;
+            case AVGUSERVISIT:
+                if(startDate==null){
+                    throw new UserPlaceException("startDate is a required parameter for statsType "+statsType.name());
+                }
+            break;
+            case PLACERECOMMENDED:
+            case PLACENOTVISITED:
+                if(userId==null){
+                    throw new UserPlaceException("userId is a required parameter for statsType "+statsType.name());
+                }
+                break;
+        }
 
+    }
 }
