@@ -16,7 +16,6 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Getter
 @Setter
 @Parameters(separators = "=")
@@ -64,7 +63,7 @@ public class UserPlaceStatsArgsParser {
         try {
             return  (null != numberOfRestaurants ) ?Integer.parseInt(numberOfRestaurants) : null;
 
-        } catch (DateTimeParseException ex) {
+        } catch (NumberFormatException ex) {
             throw new ParameterException(String.format("The given number of restaurants is not a number: %s", numberOfRestaurants));
         }
     }
